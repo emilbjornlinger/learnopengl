@@ -5,8 +5,14 @@ CMakeFiles/binary.dir/src/glad.c.o
  .././include/KHR/khrplatform.h
  .././include/glad/glad.h
  /home/emil/code/cpp/opengl/tutorial/src/glad.c
+CMakeFiles/binary.dir/src/Shader.cpp.o
+ .././include/KHR/khrplatform.h
+ .././include/glad/glad.h
+ /home/emil/code/cpp/opengl/tutorial/src/Shader.cpp
+ /home/emil/code/cpp/opengl/tutorial/src/Shader.h
 CMakeFiles/binary.dir/src/main.cpp.o
  .././include/KHR/khrplatform.h
  .././include/glad/glad.h
+ /home/emil/code/cpp/opengl/tutorial/src/Shader.h
  /home/emil/code/cpp/opengl/tutorial/src/main.cpp
  /usr/local/include/GLFW/glfw3.h

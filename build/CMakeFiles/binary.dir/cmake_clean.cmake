@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/binary.dir/src/main.cpp.o"
   "CMakeFiles/binary.dir/src/glad.c.o"
+  "CMakeFiles/binary.dir/src/Shader.cpp.o"
   "binary.pdb"
   "binary"
 )
