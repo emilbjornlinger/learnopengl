@@ -14,5 +14,6 @@ CMakeFiles/binary.dir/src/main.cpp.o: .././include/KHR/khrplatform.h
 CMakeFiles/binary.dir/src/main.cpp.o: .././include/glad/glad.h
 CMakeFiles/binary.dir/src/main.cpp.o: ../src/Shader.h
 CMakeFiles/binary.dir/src/main.cpp.o: ../src/main.cpp
+CMakeFiles/binary.dir/src/main.cpp.o: ../src/stb_image.h
 CMakeFiles/binary.dir/src/main.cpp.o: /usr/local/include/GLFW/glfw3.h
 
