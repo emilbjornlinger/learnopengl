@@ -3,6 +3,10 @@
 #include <iostream>
 #include <cmath>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "Shader.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -11,6 +15,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 float mixValue = 0.2f;
+float x = 0.0f;
+float y = 0.0f;
 
 int main() {
   glfwInit();
@@ -38,11 +44,11 @@ int main() {
 
   // Data
   float vertices[] = {
-    // positions          // colors           // texture cord
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f
+    // positions          // texture cord
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f
   };
   unsigned int indices[] = {
     0, 1, 3,
@@ -64,14 +70,11 @@ int main() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attributes
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
-  // color attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
   // texture attribute
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   // Allowed to undbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -121,10 +124,18 @@ int main() {
   }
   stbi_image_free(data);
 
+  // Transformation matrix
+  // glm::mat4   trans = glm::mat4(1.0f);
+  // trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+  // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+
   // Activate shader
   myShader.use(); // Activate shader before setting uniforms
   glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0); // Manually
   myShader.setInt("texture2", 1); // With shader class
+
+  //unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
+  //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
   while (!glfwWindowShouldClose(window)) {
     // input
@@ -143,8 +154,25 @@ int main() {
     myShader.use();
     myShader.setFloat("mixFloat", mixValue);
 
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5f + x, -0.5f + y, 0.0f));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     // Render
     glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+    // Second box
+    float factor = sin(glfwGetTime());
+    trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+    trans = glm::scale(trans, glm::vec3(factor, factor, factor));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
@@ -175,6 +203,18 @@ void processInput(GLFWwindow* window) {
   }
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+  }
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    y += 0.01;
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    y -= 0.01;
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    x -= 0.01;
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    x += 0.01;
   }
   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
     mixValue += 0.01;
