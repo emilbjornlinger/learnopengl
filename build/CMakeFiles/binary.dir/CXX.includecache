@@ -1435,9 +1435,13 @@ Shader.h
 /home/emil/code/cpp/opengl/tutorial/src/Shader.h
 cstring
 -
+glm/gtc/type_ptr.hpp
+-
 
 /home/emil/code/cpp/opengl/tutorial/src/Shader.h
 glad/glad.h
+-
+glm/glm.hpp
 -
 string
 -

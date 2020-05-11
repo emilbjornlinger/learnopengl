@@ -14,9 +14,15 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-float mixValue = 0.2f;
-float x = 0.0f;
-float y = 0.0f;
+// Settings
+const unsigned int SCR_WIDTH = 1920;
+const unsigned int SCR_HEIGHT = 1080;
+
+float x = 0;
+float y = 0;
+float z = 0;
+float y_rot = 0;
+float x_rot = 0;
 
 int main() {
   glfwInit();
@@ -24,7 +30,7 @@ int main() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
   if (window == NULL) {
     std::cout << "Failed to create a GLFW window" << std::endl;
     glfwTerminate();
@@ -44,30 +50,59 @@ int main() {
 
   // Data
   float vertices[] = {
-    // positions          // texture cord
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f
-  };
-  unsigned int indices[] = {
-    0, 1, 3,
-    1, 2, 3
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
   };
 
 
   // VAO setup
-  unsigned int VBO, VAO, EBO;
+  unsigned int VBO, VAO;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
 
   // VAO
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attributes
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
@@ -124,18 +159,26 @@ int main() {
   }
   stbi_image_free(data);
 
-  // Transformation matrix
-  // glm::mat4   trans = glm::mat4(1.0f);
-  // trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-  // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-
   // Activate shader
   myShader.use(); // Activate shader before setting uniforms
-  glUniform1i(glGetUniformLocation(myShader.ID, "texture1"), 0); // Manually
-  myShader.setInt("texture2", 1); // With shader class
+  myShader.setInt("texture1", 0); // Texture uniforms
+  myShader.setInt("texture2", 1);
 
-  //unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
-  //glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+  glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f),
+  };
+
+  // Enable OpenGl functions
+  glEnable(GL_DEPTH_TEST);
 
   while (!glfwWindowShouldClose(window)) {
     // input
@@ -143,7 +186,7 @@ int main() {
 
     // rendering
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Bind texture units
     glActiveTexture(GL_TEXTURE0);
@@ -152,28 +195,36 @@ int main() {
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     myShader.use();
-    myShader.setFloat("mixFloat", mixValue);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5f + x, -0.5f + y, 0.0f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    // Coord space transformation matrices
+    glm::mat4 view = glm::mat4(1.0f);
+    // Reverse direction of were we want to move
+    view = glm::translate(view, glm::vec3(x, y, z));
+    view = glm::rotate(view, glm::radians(x_rot), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::rotate(view, glm::radians(y_rot), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    unsigned int transformLoc = glGetUniformLocation(myShader.ID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    glm::mat4 projection;
+    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/ (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+    myShader.setMat4("view", view);
+    myShader.setMat4("projection", projection);
 
     // Render
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    for (unsigned int i = 0; i < 10; i++) {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      if (i % 3 == 0) {
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
+      }
+      else {
+        float angle = 20.0f * i;
+        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+      }
+      myShader.setMat4("model", model);
 
-
-    // Second box
-    float factor = sin(glfwGetTime());
-    trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-    trans = glm::scale(trans, glm::vec3(factor, factor, factor));
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
     glBindVertexArray(0);
 
     // check and call events and swap the buffers
@@ -205,27 +256,34 @@ void processInput(GLFWwindow* window) {
     glfwSetWindowShouldClose(window, true);
   }
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    y += 0.01;
+    z += 0.2;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    y -= 0.01;
+    z -= 0.2;
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    x -= 0.01;
+    x += 0.2;
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    x += 0.01;
+    x -= 0.2;
+  }
+  if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+    y -= 0.2;
+  }
+  if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+    y += 0.2;
   }
   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-    mixValue += 0.01;
-    if (mixValue >= 1) {
-      mixValue = 1;
-    }
+    x_rot += 2.0;
   }
   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-    mixValue -= 0.01;
-    if (mixValue <= 0) {
-      mixValue = 0;
-    }
+    x_rot -= 2.0;
   }
+  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+    y_rot += 2.0;
+  }
+  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    y_rot -= 2.0;
+  }
+
 }
