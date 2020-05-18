@@ -8,21 +8,28 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Camera.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 // Settings
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1080;
 
-float x = 0;
-float y = 0;
-float z = 0;
-float y_rot = 0;
-float x_rot = 0;
+// Timing
+float deltaTime = 0.0f; // Time between current frame and last frame
+float lastFrame = 0.0f; // Time of last frame
+
+// Camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
 
 int main() {
   glfwInit();
@@ -45,7 +52,16 @@ int main() {
 
   glViewport(0, 0, 800, 600);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwSetCursorPosCallback(window, mouse_callback);
+  glfwSetScrollCallback(window, scroll_callback);
 
+  // Mouse input
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  // Configure global opengl state
+  glEnable(GL_DEPTH_TEST);
+
+  // Create shader program
   Shader myShader("../src/shader.vs", "../src/shader.fs");
 
   // Data
@@ -177,10 +193,12 @@ int main() {
     glm::vec3(-1.3f,  1.0f, -1.5f),
   };
 
-  // Enable OpenGl functions
-  glEnable(GL_DEPTH_TEST);
-
   while (!glfwWindowShouldClose(window)) {
+    // Time
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame -  lastFrame;
+    lastFrame = currentFrame;
+
     // input
     processInput(window);
 
@@ -197,30 +215,35 @@ int main() {
     myShader.use();
 
     // Coord space transformation matrices
-    glm::mat4 view = glm::mat4(1.0f);
-    // Reverse direction of were we want to move
-    view = glm::translate(view, glm::vec3(x, y, z));
-    view = glm::rotate(view, glm::radians(x_rot), glm::vec3(1.0f, 0.0f, 0.0f));
-    view = glm::rotate(view, glm::radians(y_rot), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH/ (float)SCR_HEIGHT, 0.1f, 100.0f);
+    // Camera
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // // The direction is pointing in the positive z-axis, the camera in the
+    // // negative z-axis, so the subtraction is negated.
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+    // glm::vec3 up = glm::vec3(0.0f. 1.0f, 0.0f);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+    // // The LookAt-matrix can be calculated with the previous vectors,
+    // // GLM has a function to do this automatically using a position, target,
+    // // and up-vector (for the world-space)
 
-    myShader.setMat4("view", view);
+    // Projection
+    glm::mat4 projection = glm::perspective(glm::radians(camera.getZoom()), (float)SCR_WIDTH/ (float)SCR_HEIGHT, 0.1f, 100.0f);
     myShader.setMat4("projection", projection);
+
+    // View
+    glm::mat4 view = camera.GetViewMatrix();
+    myShader.setMat4("view", view);
 
     // Render
     glBindVertexArray(VAO);
     for (unsigned int i = 0; i < 10; i++) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
-      if (i % 3 == 0) {
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-      }
-      else {
-        float angle = 20.0f * i;
-        model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-      }
+      float angle = 20.0f * i;
+      model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
       myShader.setMat4("model", model);
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -245,6 +268,27 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+
+  // If entering the window for the first time
+  if (firstMouse) {
+    lastX = xpos;
+    lastY = ypos;
+    firstMouse = false;
+  }
+
+  float xoffset = xpos - lastX;
+  float yoffset = lastY - ypos;
+  lastX = xpos;
+  lastY = ypos;
+
+  camera.processMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+  camera.processMouseScroll(yoffset);
+}
+
 void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -255,35 +299,18 @@ void processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
   }
+
+  // Movement
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    z += 0.2;
+    camera.processKeyboard(Camera_Movement::FORWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    z -= 0.2;
+    camera.processKeyboard(Camera_Movement::BACKWARD, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    x += 0.2;
+    camera.processKeyboard(Camera_Movement::LEFT, deltaTime);
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    x -= 0.2;
+    camera.processKeyboard(Camera_Movement::RIGHT, deltaTime);
   }
-  if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-    y -= 0.2;
-  }
-  if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-    y += 0.2;
-  }
-  if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-    x_rot += 2.0;
-  }
-  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-    x_rot -= 2.0;
-  }
-  if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-    y_rot += 2.0;
-  }
-  if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-    y_rot -= 2.0;
-  }
-
 }

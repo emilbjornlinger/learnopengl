@@ -1430,6 +1430,16 @@ detail/setup.hpp
 detail/func_vector_relational.inl
 .././src/glm/detail/func_vector_relational.inl
 
+/home/emil/code/cpp/opengl/tutorial/src/Camera.h
+glad/glad.h
+-
+glm/glm.hpp
+-
+glm/gtc/matrix_transform.hpp
+-
+vector
+-
+
 /home/emil/code/cpp/opengl/tutorial/src/Shader.cpp
 Shader.h
 /home/emil/code/cpp/opengl/tutorial/src/Shader.h
@@ -1469,6 +1479,8 @@ glm/gtc/type_ptr.hpp
 -
 Shader.h
 /home/emil/code/cpp/opengl/tutorial/src/Shader.h
+Camera.h
+/home/emil/code/cpp/opengl/tutorial/src/Camera.h
 stb_image.h
 /home/emil/code/cpp/opengl/tutorial/src/stb_image.h
 

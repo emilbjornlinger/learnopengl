@@ -416,6 +416,7 @@ CMakeFiles/binary.dir/src/main.cpp.o: .././src/glm/vec2.hpp
 CMakeFiles/binary.dir/src/main.cpp.o: .././src/glm/vec3.hpp
 CMakeFiles/binary.dir/src/main.cpp.o: .././src/glm/vec4.hpp
 CMakeFiles/binary.dir/src/main.cpp.o: .././src/glm/vector_relational.hpp
+CMakeFiles/binary.dir/src/main.cpp.o: ../src/Camera.h
 CMakeFiles/binary.dir/src/main.cpp.o: ../src/Shader.h
 CMakeFiles/binary.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/binary.dir/src/main.cpp.o: ../src/stb_image.h

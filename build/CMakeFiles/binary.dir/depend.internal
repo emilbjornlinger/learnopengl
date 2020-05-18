@@ -417,6 +417,7 @@ CMakeFiles/binary.dir/src/main.cpp.o
  .././src/glm/vec3.hpp
  .././src/glm/vec4.hpp
  .././src/glm/vector_relational.hpp
+ /home/emil/code/cpp/opengl/tutorial/src/Camera.h
  /home/emil/code/cpp/opengl/tutorial/src/Shader.h
  /home/emil/code/cpp/opengl/tutorial/src/main.cpp
  /home/emil/code/cpp/opengl/tutorial/src/stb_image.h
