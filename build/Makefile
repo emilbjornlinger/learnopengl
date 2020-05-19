@@ -123,6 +123,33 @@ binary/fast:
 	$(MAKE) -f CMakeFiles/binary.dir/build.make CMakeFiles/binary.dir/build
 .PHONY : binary/fast
 
+src/Sandbox.o: src/Sandbox.cpp.o
+
+.PHONY : src/Sandbox.o
+
+# target to build an object file
+src/Sandbox.cpp.o:
+	$(MAKE) -f CMakeFiles/binary.dir/build.make CMakeFiles/binary.dir/src/Sandbox.cpp.o
+.PHONY : src/Sandbox.cpp.o
+
+src/Sandbox.i: src/Sandbox.cpp.i
+
+.PHONY : src/Sandbox.i
+
+# target to preprocess a source file
+src/Sandbox.cpp.i:
+	$(MAKE) -f CMakeFiles/binary.dir/build.make CMakeFiles/binary.dir/src/Sandbox.cpp.i
+.PHONY : src/Sandbox.cpp.i
+
+src/Sandbox.s: src/Sandbox.cpp.s
+
+.PHONY : src/Sandbox.s
+
+# target to generate assembly for a file
+src/Sandbox.cpp.s:
+	$(MAKE) -f CMakeFiles/binary.dir/build.make CMakeFiles/binary.dir/src/Sandbox.cpp.s
+.PHONY : src/Sandbox.cpp.s
+
 src/Shader.o: src/Shader.cpp.o
 
 .PHONY : src/Shader.o
@@ -213,6 +240,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... binary"
 	@echo "... edit_cache"
+	@echo "... src/Sandbox.o"
+	@echo "... src/Sandbox.i"
+	@echo "... src/Sandbox.s"
 	@echo "... src/Shader.o"
 	@echo "... src/Shader.i"
 	@echo "... src/Shader.s"

@@ -16,6 +16,7 @@ set(CMAKE_C_TARGET_INCLUDE_PATH
   "/usr/local/include"
   )
 set(CMAKE_DEPENDS_CHECK_CXX
+  "/home/emil/code/cpp/opengl/tutorial/src/Sandbox.cpp" "/home/emil/code/cpp/opengl/tutorial/build/CMakeFiles/binary.dir/src/Sandbox.cpp.o"
   "/home/emil/code/cpp/opengl/tutorial/src/Shader.cpp" "/home/emil/code/cpp/opengl/tutorial/build/CMakeFiles/binary.dir/src/Shader.cpp.o"
   "/home/emil/code/cpp/opengl/tutorial/src/main.cpp" "/home/emil/code/cpp/opengl/tutorial/build/CMakeFiles/binary.dir/src/main.cpp.o"
   )
