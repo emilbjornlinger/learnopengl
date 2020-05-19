@@ -8,21 +8,21 @@
 #include "Shader.h"
 #include "Camera.h"
 
-// Settings
-const unsigned int SCR_WIDTH = 1920;
-const unsigned int SCR_HEIGHT = 1080;
-
-// Camera, this is horrible :(
-static Camera m_camera(glm::vec3(0.0f, 1.0f, 3.0f));
-static float m_lastX = SCR_WIDTH / 2.0f;
-static float m_lastY = SCR_HEIGHT / 2.0f;
-static bool m_firstMouse = true;
-
 class Sandbox {
 private:
   GLFWwindow* m_window;
   Shader* m_shader;
   Shader* m_groundShader;
+
+  // Settings
+  const unsigned int SCR_WIDTH = 1920;
+  const unsigned int SCR_HEIGHT = 1080;
+
+  // Camera
+  Camera m_camera;
+  float m_lastX = SCR_WIDTH / 2.0f;
+  float m_lastY = SCR_HEIGHT / 2.0f;
+  bool m_firstMouse = true;
 
   // Timing
   float m_deltaTime = 0.0f; // Time between current frame and last frame
@@ -44,6 +44,9 @@ private:
   // Callback functions
   static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
   static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+
+  // called from callback through user pointer
+  void mouse_callback(double xpos, double ypos);
 
   void processInput(GLFWwindow* window);
   glm::vec3 getPosition();

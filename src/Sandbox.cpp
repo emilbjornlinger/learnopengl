@@ -9,7 +9,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Sandbox::Sandbox() {
+Sandbox::Sandbox() :
+  m_camera(glm::vec3(0.0f, 1.0f, 3.0f)) {
    initGLFW();
 
   // Global OpenGL states
@@ -124,6 +125,7 @@ void Sandbox::initGLFW() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   m_window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
+  glfwSetWindowUserPointer(m_window, this);
   if (m_window == NULL) {
     std::cout << "Failed to create a GLFW window" << std::endl;
     glfwTerminate();
@@ -331,6 +333,11 @@ void Sandbox::framebuffer_size_callback(GLFWwindow* window, int width, int heigh
 }
 
 void Sandbox::mouse_callback(GLFWwindow* window, double xpos, double ypos) {
+  Sandbox* sandbox = static_cast<Sandbox*>(glfwGetWindowUserPointer(window));
+  sandbox->mouse_callback(xpos, ypos);
+}
+
+void Sandbox::mouse_callback(double xpos, double ypos) {
   // If entering the window for the first time
   if (m_firstMouse) {
     m_lastX = xpos;
@@ -370,4 +377,8 @@ void Sandbox::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     m_camera.processKeyboard(Camera_Movement::RIGHT, m_deltaTime);
   }
+}
+
+glm::vec3 Sandbox::getPosition() {
+  return glm::vec3(0.0f, 0.0f, 0.0f);
 }
