@@ -8,6 +8,8 @@
 #include "Shader.h"
 #include "Camera.h"
 
+const float GRAVITY = 4.4f;
+
 class Sandbox {
 private:
   GLFWwindow* m_window;
@@ -33,7 +35,15 @@ private:
 
   bool m_statusOK = true;
 
-  // Physics variables
+  // Physics variables, better in separate class really
+  glm::vec3 m_vel;
+  glm::vec3 m_pos;
+  bool m_active;
+
+  // Physics functions
+  void throwNewCube();
+  void updateCube(float dt);
+  void checkCollision();
 
   // Initialising functions
   void initGLFW();
@@ -43,13 +53,13 @@ private:
 
   // Callback functions
   static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+  // User pointer
   static void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-
-  // called from callback through user pointer
   void mouse_callback(double xpos, double ypos);
+  static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+  void mouse_button_callback(int button, int action, int mods);
 
   void processInput(GLFWwindow* window);
-  glm::vec3 getPosition();
 public:
   Sandbox();
   ~Sandbox();

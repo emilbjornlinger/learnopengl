@@ -10,8 +10,12 @@
 #include "stb_image.h"
 
 Sandbox::Sandbox() :
-  m_camera(glm::vec3(0.0f, 1.0f, 3.0f)) {
-   initGLFW();
+  m_camera(glm::vec3(0.0f, 1.0f, 3.0f)),
+  m_vel(glm::vec3(0.0f, 0.0f, 0.0f)),
+  m_pos(glm::vec3(0.0f, 0.0f, 0.0f)),
+  m_active(false) {
+
+  initGLFW();
 
   // Global OpenGL states
   glEnable(GL_DEPTH_TEST);
@@ -30,18 +34,6 @@ Sandbox::~Sandbox() {
 }
 
 void Sandbox::run() {
-  glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f,  0.0f,  0.0f),
-    glm::vec3( 2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3( 2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3( 1.3f, -2.0f, -2.5f),
-    glm::vec3( 1.5f,  2.0f, -2.5f),
-    glm::vec3( 1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f),
-  };
 
   while (!glfwWindowShouldClose(m_window)) {
     // Time
@@ -51,6 +43,12 @@ void Sandbox::run() {
 
     // input
     processInput(m_window);
+
+    // Update cube
+    if (m_active) {
+      updateCube(m_deltaTime);
+      checkCollision();
+    }
 
     // rendering
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -71,19 +69,20 @@ void Sandbox::run() {
     glm::mat4 view = m_camera.GetViewMatrix();
     m_shader->setMat4("view", view);
 
-    // Implement model matrix with getPosition here, basic collision detection
+    // Model
+    glm::mat4 model = glm::mat4(1.0f);
 
-    // Draw calls for cubes
-    glBindVertexArray(m_cubeVAO);
-    for (unsigned int i = 0; i < 10; i++) {
-      glm::mat4 model = glm::mat4(1.0f);
-      model = glm::translate(model, cubePositions[i]);
-      float angle = 20.0f * i;
-      model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+    if (m_active) {
+      // Calculate new position
+      model = glm::translate(model, m_pos);
+      model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
       m_shader->setMat4("model", model);
 
+      // Draw call for cube
+      glBindVertexArray(m_cubeVAO);
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+
 
     // Set texture unit
     m_groundShader->use();
@@ -94,7 +93,7 @@ void Sandbox::run() {
     m_groundShader->setMat4("projection", projection);
     m_groundShader->setMat4("view", view);
 
-    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::mat4(1.0f);
     m_groundShader->setMat4("model", model);
 
     // Draw call for ground
@@ -116,6 +115,33 @@ void Sandbox::run() {
   glDeleteBuffers(1, &m_groundEBO);
 
   glfwTerminate();
+}
+
+void Sandbox::throwNewCube() {
+  // Called from mouse input, get direction and set velocity and position
+  m_active = true;
+  m_pos = m_camera.getPosition();
+  m_vel = m_camera.getFront() * 10.0f;
+}
+
+void Sandbox::updateCube(float dt) {
+  // Calculate new offset
+  float dx = m_vel.x * dt;
+  float dy = m_vel.y * dt - GRAVITY*dt*dt/2.0f;
+  float dz = m_vel.z * dt;
+
+  // Calculate new velocity
+  m_vel = glm::vec3(m_vel.x, m_vel.y - GRAVITY * dt, m_vel.z);
+
+  // Add offset to position
+  m_pos = m_pos + glm::vec3(dx, dy, dz);
+}
+
+void Sandbox::checkCollision() {
+  // Check if y-value is < 0, set active to false to stop rendering
+  if (m_pos.y < 0) {
+    m_active = false;
+  }
 }
 
 void Sandbox::initGLFW() {
@@ -141,6 +167,7 @@ void Sandbox::initGLFW() {
   glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
   glfwSetFramebufferSizeCallback(m_window, framebuffer_size_callback);
   glfwSetCursorPosCallback(m_window, mouse_callback);
+  glfwSetMouseButtonCallback(m_window, mouse_button_callback);
 
   // Mouse input
   glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -220,10 +247,10 @@ void Sandbox::initVAO() {
   glBindVertexArray(0);
 
   float ground[] = {
-    -5.0f,  0.0f,   5.0f,   0.0f,   0.0f, // Bottom left
-    -5.0f,  0.0f,  -5.0f,   0.0f,   1.0f, // Top left
-     5.0f,  0.0f,  -5.0f,   1.0f,   1.0f, // Top rigth
-     5.0f,  0.0f,   5.0f,   1.0f,   0.0f  // Bottom right
+    -10.0f,  0.0f,   10.0f,   0.0f,   0.0f, // Bottom left
+    -10.0f,  0.0f,  -10.0f,   0.0f,   1.0f, // Top left
+     10.0f,  0.0f,  -10.0f,   1.0f,   1.0f, // Top rigth
+     10.0f,  0.0f,   10.0f,   1.0f,   0.0f  // Bottom right
   };
 
   unsigned int groundIndices[] = {
@@ -353,6 +380,19 @@ void Sandbox::mouse_callback(double xpos, double ypos) {
   m_camera.processMouseMovement(xoffset, yoffset);
 }
 
+void Sandbox::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+  Sandbox* sandbox = static_cast<Sandbox*>(glfwGetWindowUserPointer(window));
+  sandbox->mouse_button_callback(button, action, mods);
+}
+
+void Sandbox::mouse_button_callback(int button, int action, int mods) {
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    if (!m_active) {
+      throwNewCube();
+    }
+  }
+}
+
 void Sandbox::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -377,8 +417,4 @@ void Sandbox::processInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
     m_camera.processKeyboard(Camera_Movement::RIGHT, m_deltaTime);
   }
-}
-
-glm::vec3 Sandbox::getPosition() {
-  return glm::vec3(0.0f, 0.0f, 0.0f);
 }
