@@ -1,1 +1,1 @@
-/usr/bin/c++    -rdynamic CMakeFiles/binary.dir/src/main.cpp.o CMakeFiles/binary.dir/src/glad.c.o CMakeFiles/binary.dir/src/Shader.cpp.o CMakeFiles/binary.dir/src/Sandbox.cpp.o  -o binary -lglfw3 -lrt -lm -ldl -lX11 -lpthread -lxcb -lXau -lXdmcp -lGL -lX11 -lpthread -lXrandr -lXi -ldl 
+/usr/bin/c++    -rdynamic CMakeFiles/binary.dir/src/main.cpp.o CMakeFiles/binary.dir/src/glad.c.o CMakeFiles/binary.dir/src/Shader.cpp.o  -o binary -lglfw3 -lrt -lm -ldl -lX11 -lpthread -lxcb -lXau -lXdmcp -lGL -lX11 -lpthread -lXrandr -lXi -ldl 
