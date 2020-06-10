@@ -89,16 +89,16 @@ public:
   void processKeyboard(Camera_Movement direction, float deltaTime) {
     float velocity = m_movementSpeed * deltaTime;
     if (direction == Camera_Movement::FORWARD) {
-      m_position += glm::normalize(glm::vec3(m_front.x, 0.0f, m_front.z)) * velocity;
+      m_position += glm::normalize(glm::vec3(m_front.x, m_front.y, m_front.z)) * velocity;
     }
     if (direction == Camera_Movement::BACKWARD) {
-      m_position -= glm::normalize(glm::vec3(m_front.x, 0.0f, m_front.z)) * velocity;
+      m_position -= glm::normalize(glm::vec3(m_front.x, m_front.y, m_front.z)) * velocity;
     }
     if (direction == Camera_Movement::LEFT) {
-      m_position -= glm::normalize(glm::vec3(m_right.x, 0.0f, m_right.z)) * velocity;
+      m_position -= glm::normalize(glm::vec3(m_right.x, m_right.y, m_right.z)) * velocity;
     }
     if (direction == Camera_Movement::RIGHT) {
-      m_position += glm::normalize(glm::vec3(m_right.x, 0.0f, m_right.z)) * velocity;
+      m_position += glm::normalize(glm::vec3(m_right.x, m_right.y, m_right.z)) * velocity;
     }
   }
 
