@@ -169,15 +169,29 @@ int main() {
     processInput(window);
 
     // rendering
-    glClearColor(0.1f, 0.15f, 0.15f, 1.0f);
+    glClearColor(0.05f, 0.075f, 0.075f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Set lightingShader uniforms, needed in loop since
     // the view position is updated
     lightingShader.use();
-    lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3("lightPos", lightPos);
+    lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+    lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+    lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    lightingShader.setFloat("material.shininess", 32.0f);
+    lightingShader.setVec3("light.position", lightPos);
+
+    glm::vec3 lightColor;
+    lightColor.x = sin(glfwGetTime() * 2.0f);
+    lightColor.y = sin(glfwGetTime() * 0.7f);
+    lightColor.z = sin(glfwGetTime() * 1.3f);
+
+    glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+    glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+    lightingShader.setVec3("light.ambient", ambientColor);
+    lightingShader.setVec3("light.diffuse", diffuseColor);
+    lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
     lightingShader.setVec3("viewPos", camera.getPosition());
 
     // Projection
@@ -203,6 +217,7 @@ int main() {
     model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.2f));
     lightCubeShader.setMat4("model", model);
+    lightCubeShader.setVec3("lightColor", lightColor);
 
     // Draw the lightCube
     glBindVertexArray(lightVAO);
