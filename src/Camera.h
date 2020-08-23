@@ -175,7 +175,7 @@ public:
     translation[3].y = -position.y;
     translation[3].z = -position.z;
 
-    return rotation * translation;
+    return  rotation * translation;
   }
 
 private:
