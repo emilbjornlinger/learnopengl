@@ -187,6 +187,8 @@ int main() {
   lightingShader.setInt("material.specular", 1);
   //lightingShader.setInt("material.emission", 2);
 
+  bool cheekyBool = true;
+
   while (!glfwWindowShouldClose(window)) {
     // Time
     float currentFrame = glfwGetTime();
