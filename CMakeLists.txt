@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0)
+cmake_minimum_required( VERSION 3.5)
 
 # Project name
 project( test )
@@ -20,6 +20,6 @@ find_package(glfw3 3.3 REQUIRED)
 include_directories( ./include ./src )
 
 # target
-add_executable( binary ./src/main.cpp ./src/glad.c ./src/Shader.cpp)
+add_executable( binary ./src/main.cpp ./src/glad.c)
 
 target_link_libraries( binary glfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl)
